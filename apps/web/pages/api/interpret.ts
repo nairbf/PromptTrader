@@ -18,7 +18,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (isVaguePrompt(prompt)) {
     res.status(422).json({
       message: "Prompt is too vague. Specify entries, exits, indicators, and risk settings.",
-      clarifyingQuestions: [
+      clarifying_questions: [
         "Which indicators and parameters should define the entry?",
         "What exit rules (SL/TP, time-based) should be used?",
         "What position sizing or risk-per-trade should be applied?"

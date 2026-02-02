@@ -11,6 +11,10 @@
     "exitRules",
     "risk",
     "tradeManagement",
+    "entry_rules",
+    "exit_rules",
+    "risk",
+    "trade_management",
     "execution",
     "constraints"
   ],
@@ -18,12 +22,14 @@
     "metadata": {
       "type": "object",
       "required": ["name", "description", "symbols", "timeframes", "sessionTimezone", "session"],
+      "required": ["name", "description", "symbols", "timeframes", "session_timezone", "session"],
       "properties": {
         "name": { "type": "string" },
         "description": { "type": "string" },
         "symbols": { "type": "array", "items": { "type": "string" } },
         "timeframes": { "type": "array", "items": { "type": "string" } },
         "sessionTimezone": { "type": "string" },
+        "session_timezone": { "type": "string" },
         "session": {
           "type": "object",
           "required": ["start", "end"],
@@ -60,6 +66,7 @@
       }
     },
     "entryRules": {
+    "entry_rules": {
       "type": "object",
       "required": ["long", "short"],
       "properties": {
@@ -68,6 +75,7 @@
       }
     },
     "exitRules": {
+    "exit_rules": {
       "type": "object",
       "required": ["description"],
       "properties": {
@@ -75,6 +83,9 @@
         "stopLossAtrMultiplier": { "type": "number" },
         "takeProfitRr": { "type": "number" },
         "exitConditions": { "$ref": "#/$defs/conditionNode" }
+        "stop_loss_atr_multiplier": { "type": "number" },
+        "take_profit_rr": { "type": "number" },
+        "exit_conditions": { "$ref": "#/$defs/conditionNode" }
       }
     },
     "risk": {
@@ -92,6 +103,17 @@
       "properties": {
         "breakEven": { "$ref": "#/$defs/breakEven" },
         "trailingStop": { "$ref": "#/$defs/trailingStop" },
+        "mode": { "type": "string", "enum": ["fixed_lot", "percent_equity"] },
+        "fixed_lot": { "type": "number" },
+        "max_risk_per_trade_percent": { "type": "number" },
+        "max_risk_per_day_percent": { "type": "number" }
+      }
+    },
+    "trade_management": {
+      "type": "object",
+      "properties": {
+        "break_even": { "$ref": "#/$defs/breakEven" },
+        "trailing_stop": { "$ref": "#/$defs/trailingStop" },
         "partials": { "$ref": "#/$defs/partials" }
       }
     },
@@ -102,6 +124,11 @@
         "orderType": { "type": "string", "enum": ["market", "limit", "stop"] },
         "slippagePoints": { "type": "number" },
         "magicNumber": { "type": "number" }
+      "required": ["order_type", "slippage_points", "magic_number"],
+      "properties": {
+        "order_type": { "type": "string", "enum": ["market", "limit", "stop"] },
+        "slippage_points": { "type": "number" },
+        "magic_number": { "type": "number" }
       }
     },
     "constraints": {
@@ -113,6 +140,12 @@
         "cooldownBars": { "type": "number" },
         "oneTradePerBar": { "type": "boolean" },
         "maxSpread": { "type": "number" }
+      "required": ["max_trades_per_day", "cooldown_bars", "one_trade_per_bar", "max_spread_points"],
+      "properties": {
+        "max_trades_per_day": { "type": "number" },
+        "cooldown_bars": { "type": "number" },
+        "one_trade_per_bar": { "type": "boolean" },
+        "max_spread_points": { "type": "number" }
       }
     }
   },
@@ -208,6 +241,11 @@
         "enabled": { "type": "boolean" },
         "triggerRr": { "type": "number" },
         "offsetPoints": { "type": "number" }
+      "required": ["enabled", "trigger_rr", "offset_points"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "trigger_rr": { "type": "number" },
+        "offset_points": { "type": "number" }
       }
     },
     "trailingStop": {
@@ -216,6 +254,10 @@
       "properties": {
         "enabled": { "type": "boolean" },
         "atrMultiplier": { "type": "number" }
+      "required": ["enabled", "atr_multiplier"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "atr_multiplier": { "type": "number" }
       }
     },
     "partials": {
@@ -231,6 +273,10 @@
             "properties": {
               "rr": { "type": "number" },
               "percentClose": { "type": "number" }
+            "required": ["rr", "percent_close"],
+            "properties": {
+              "rr": { "type": "number" },
+              "percent_close": { "type": "number" }
             }
           }
         }

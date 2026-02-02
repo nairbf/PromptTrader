@@ -1,11 +1,11 @@
 import Layout from "../components/Layout";
-import StrategyBuilder from "../components/StrategyBuilder";
+import BuilderBlocks from "../components/BuilderBlocks";
 import { sampleStrategySpec } from "@prompttrader/schema";
 
 export default function BuilderPage() {
   return (
     <Layout>
-      <StrategyBuilder initialSpec={sampleStrategySpec} />
+      <BuilderBlocks spec={sampleStrategySpec} />
     </Layout>
   );
 }
