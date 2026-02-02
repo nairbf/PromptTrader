@@ -1,0 +1,29 @@
+import { StrategySpec } from "@prompttrader/schema";
+
+interface BuilderBlocksProps {
+  spec: StrategySpec;
+}
+
+export default function BuilderBlocks({ spec }: BuilderBlocksProps) {
+  return (
+    <section style={{ display: "grid", gap: "16px" }}>
+      <h2>Visual Builder (Preview)</h2>
+      <div style={{ display: "grid", gap: "12px" }}>
+        <div style={{ border: "1px solid #ddd", padding: "12px", borderRadius: "8px" }}>
+          <h3>Entries</h3>
+          <p>Long: {spec.entryRules.long.description}</p>
+          <p>Short: {spec.entryRules.short.description}</p>
+        </div>
+        <div style={{ border: "1px solid #ddd", padding: "12px", borderRadius: "8px" }}>
+          <h3>Exits</h3>
+          <p>{spec.exitRules.description}</p>
+        </div>
+        <div style={{ border: "1px solid #ddd", padding: "12px", borderRadius: "8px" }}>
+          <h3>Risk</h3>
+          <p>Mode: {spec.risk.mode}</p>
+          <p>Risk %: {spec.risk.riskPercent ?? "-"}</p>
+        </div>
+      </div>
+    </section>
+  );
+}
