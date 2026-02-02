@@ -8,6 +8,10 @@ const validateSpec = (spec: StrategySpec): ValidationIssue[] => {
   if (!spec.metadata?.name) {
     issues.push({ level: "error", message: "Missing strategy name." });
   }
+  if (!spec.entryRules?.long || !spec.entryRules?.short) {
+    issues.push({ level: "error", message: "Missing entry rules for long/short." });
+  }
+  if (!spec.exitRules?.stopLossAtrMultiplier && !spec.exitRules?.exitConditions) {
   if (!spec.entry_rules?.long || !spec.entry_rules?.short) {
     issues.push({ level: "error", message: "Missing entry rules for long/short." });
   }
@@ -16,6 +20,12 @@ const validateSpec = (spec: StrategySpec): ValidationIssue[] => {
       level: "warning",
       message: "No stop loss specified. Consider adding SL for risk control."
     });
+  }
+  if (spec.constraints.maxTradesPerDay <= 0) {
+    issues.push({ level: "warning", message: "Max trades per day should be greater than 0." });
+  }
+  if (spec.constraints.maxPositions <= 0) {
+    issues.push({ level: "warning", message: "Max positions should be greater than 0." });
   }
   if (spec.constraints.max_trades_per_day <= 0) {
     issues.push({ level: "warning", message: "Max trades per day should be greater than 0." });

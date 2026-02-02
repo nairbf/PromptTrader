@@ -5,6 +5,14 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@prompttrader/schema": "*"
+  },
+  "devDependencies": {
+    "vitest": "1.6.0"
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {

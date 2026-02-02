@@ -46,6 +46,31 @@ export type EntryRule = {
 
 export type ExitRule = {
   description: string;
+  stopLossAtrMultiplier?: number;
+  takeProfitRr?: number;
+  exitConditions?: ConditionNode;
+};
+
+export type RiskSettings = {
+  mode: "fixedLot" | "percentEquity";
+  fixedLot?: number;
+  riskPercent?: number;
+  maxRiskPerDayPercent?: number;
+};
+
+export type TradeManagement = {
+  breakEven?: {
+    enabled: boolean;
+    triggerRr: number;
+    offsetPoints: number;
+  };
+  trailingStop?: {
+    enabled: boolean;
+    atrMultiplier: number;
+  };
+  partials?: {
+    enabled: boolean;
+    levels: Array<{ rr: number; percentClose: number }>;
   stop_loss_atr_multiplier?: number;
   take_profit_rr?: number;
   exit_conditions?: ConditionNode;
@@ -75,6 +100,17 @@ export type TradeManagement = {
 };
 
 export type ExecutionSettings = {
+  orderType: "market" | "limit" | "stop";
+  slippagePoints: number;
+  magicNumber: number;
+};
+
+export type Constraints = {
+  maxTradesPerDay: number;
+  maxPositions: number;
+  cooldownBars: number;
+  oneTradePerBar: boolean;
+  maxSpread: number;
   order_type: "market" | "limit" | "stop";
   slippage_points: number;
   magic_number: number;
@@ -99,11 +135,19 @@ export type StrategySpec = {
     description: string;
     symbols: string[];
     timeframes: string[];
+    sessionTimezone: string;
     session_timezone: string;
     session: { start: string; end: string };
   };
   inputs: Array<{ key: string; label: string; type: "number" | "boolean"; value: number | boolean }>;
   indicators: IndicatorSpec[];
+  entryRules: {
+    long: EntryRule;
+    short: EntryRule;
+  };
+  exitRules: ExitRule;
+  risk: RiskSettings;
+  tradeManagement: TradeManagement;
   entry_rules: {
     long: EntryRule;
     short: EntryRule;

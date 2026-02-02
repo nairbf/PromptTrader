@@ -7,6 +7,10 @@
     "metadata",
     "inputs",
     "indicators",
+    "entryRules",
+    "exitRules",
+    "risk",
+    "tradeManagement",
     "entry_rules",
     "exit_rules",
     "risk",
@@ -17,12 +21,14 @@
   "properties": {
     "metadata": {
       "type": "object",
+      "required": ["name", "description", "symbols", "timeframes", "sessionTimezone", "session"],
       "required": ["name", "description", "symbols", "timeframes", "session_timezone", "session"],
       "properties": {
         "name": { "type": "string" },
         "description": { "type": "string" },
         "symbols": { "type": "array", "items": { "type": "string" } },
         "timeframes": { "type": "array", "items": { "type": "string" } },
+        "sessionTimezone": { "type": "string" },
         "session_timezone": { "type": "string" },
         "session": {
           "type": "object",
@@ -59,6 +65,7 @@
         }
       }
     },
+    "entryRules": {
     "entry_rules": {
       "type": "object",
       "required": ["long", "short"],
@@ -67,11 +74,15 @@
         "short": { "$ref": "#/$defs/entryRule" }
       }
     },
+    "exitRules": {
     "exit_rules": {
       "type": "object",
       "required": ["description"],
       "properties": {
         "description": { "type": "string" },
+        "stopLossAtrMultiplier": { "type": "number" },
+        "takeProfitRr": { "type": "number" },
+        "exitConditions": { "$ref": "#/$defs/conditionNode" }
         "stop_loss_atr_multiplier": { "type": "number" },
         "take_profit_rr": { "type": "number" },
         "exit_conditions": { "$ref": "#/$defs/conditionNode" }
@@ -81,6 +92,17 @@
       "type": "object",
       "required": ["mode"],
       "properties": {
+        "mode": { "type": "string", "enum": ["fixedLot", "percentEquity"] },
+        "fixedLot": { "type": "number" },
+        "riskPercent": { "type": "number" },
+        "maxRiskPerDayPercent": { "type": "number" }
+      }
+    },
+    "tradeManagement": {
+      "type": "object",
+      "properties": {
+        "breakEven": { "$ref": "#/$defs/breakEven" },
+        "trailingStop": { "$ref": "#/$defs/trailingStop" },
         "mode": { "type": "string", "enum": ["fixed_lot", "percent_equity"] },
         "fixed_lot": { "type": "number" },
         "max_risk_per_trade_percent": { "type": "number" },
@@ -97,6 +119,11 @@
     },
     "execution": {
       "type": "object",
+      "required": ["orderType", "slippagePoints", "magicNumber"],
+      "properties": {
+        "orderType": { "type": "string", "enum": ["market", "limit", "stop"] },
+        "slippagePoints": { "type": "number" },
+        "magicNumber": { "type": "number" }
       "required": ["order_type", "slippage_points", "magic_number"],
       "properties": {
         "order_type": { "type": "string", "enum": ["market", "limit", "stop"] },
@@ -106,6 +133,13 @@
     },
     "constraints": {
       "type": "object",
+      "required": ["maxTradesPerDay", "maxPositions", "cooldownBars", "oneTradePerBar", "maxSpread"],
+      "properties": {
+        "maxTradesPerDay": { "type": "number" },
+        "maxPositions": { "type": "number" },
+        "cooldownBars": { "type": "number" },
+        "oneTradePerBar": { "type": "boolean" },
+        "maxSpread": { "type": "number" }
       "required": ["max_trades_per_day", "cooldown_bars", "one_trade_per_bar", "max_spread_points"],
       "properties": {
         "max_trades_per_day": { "type": "number" },
@@ -202,6 +236,11 @@
     },
     "breakEven": {
       "type": "object",
+      "required": ["enabled", "triggerRr", "offsetPoints"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "triggerRr": { "type": "number" },
+        "offsetPoints": { "type": "number" }
       "required": ["enabled", "trigger_rr", "offset_points"],
       "properties": {
         "enabled": { "type": "boolean" },
@@ -211,6 +250,10 @@
     },
     "trailingStop": {
       "type": "object",
+      "required": ["enabled", "atrMultiplier"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "atrMultiplier": { "type": "number" }
       "required": ["enabled", "atr_multiplier"],
       "properties": {
         "enabled": { "type": "boolean" },
@@ -226,6 +269,10 @@
           "type": "array",
           "items": {
             "type": "object",
+            "required": ["rr", "percentClose"],
+            "properties": {
+              "rr": { "type": "number" },
+              "percentClose": { "type": "number" }
             "required": ["rr", "percent_close"],
             "properties": {
               "rr": { "type": "number" },
