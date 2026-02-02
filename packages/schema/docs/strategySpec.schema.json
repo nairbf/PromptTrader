@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prompttrader.local/schema/strategySpec.json",
+  "title": "StrategySpec",
+  "type": "object",
+  "required": [
+    "metadata",
+    "inputs",
+    "indicators",
+    "entry_rules",
+    "exit_rules",
+    "risk",
+    "trade_management",
+    "execution",
+    "constraints"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["name", "description", "symbols", "timeframes", "session_timezone", "session"],
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "symbols": { "type": "array", "items": { "type": "string" } },
+        "timeframes": { "type": "array", "items": { "type": "string" } },
+        "session_timezone": { "type": "string" },
+        "session": {
+          "type": "object",
+          "required": ["start", "end"],
+          "properties": {
+            "start": { "type": "string" },
+            "end": { "type": "string" }
+          }
+        }
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["key", "label", "type", "value"],
+        "properties": {
+          "key": { "type": "string" },
+          "label": { "type": "string" },
+          "type": { "type": "string", "enum": ["number", "boolean"] },
+          "value": { "type": ["number", "boolean"] }
+        }
+      }
+    },
+    "indicators": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "params"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string", "enum": ["SMA", "EMA", "RSI", "ATR", "MACD"] },
+          "params": { "type": "object", "additionalProperties": { "type": "number" } }
+        }
+      }
+    },
+    "entry_rules": {
+      "type": "object",
+      "required": ["long", "short"],
+      "properties": {
+        "long": { "$ref": "#/$defs/entryRule" },
+        "short": { "$ref": "#/$defs/entryRule" }
+      }
+    },
+    "exit_rules": {
+      "type": "object",
+      "required": ["description"],
+      "properties": {
+        "description": { "type": "string" },
+        "stop_loss_atr_multiplier": { "type": "number" },
+        "take_profit_rr": { "type": "number" },
+        "exit_conditions": { "$ref": "#/$defs/conditionNode" }
+      }
+    },
+    "risk": {
+      "type": "object",
+      "required": ["mode"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["fixed_lot", "percent_equity"] },
+        "fixed_lot": { "type": "number" },
+        "max_risk_per_trade_percent": { "type": "number" },
+        "max_risk_per_day_percent": { "type": "number" }
+      }
+    },
+    "trade_management": {
+      "type": "object",
+      "properties": {
+        "break_even": { "$ref": "#/$defs/breakEven" },
+        "trailing_stop": { "$ref": "#/$defs/trailingStop" },
+        "partials": { "$ref": "#/$defs/partials" }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "required": ["order_type", "slippage_points", "magic_number"],
+      "properties": {
+        "order_type": { "type": "string", "enum": ["market", "limit", "stop"] },
+        "slippage_points": { "type": "number" },
+        "magic_number": { "type": "number" }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "required": ["max_trades_per_day", "cooldown_bars", "one_trade_per_bar", "max_spread_points"],
+      "properties": {
+        "max_trades_per_day": { "type": "number" },
+        "cooldown_bars": { "type": "number" },
+        "one_trade_per_bar": { "type": "boolean" },
+        "max_spread_points": { "type": "number" }
+      }
+    }
+  },
+  "$defs": {
+    "entryRule": {
+      "type": "object",
+      "required": ["description", "conditions"],
+      "properties": {
+        "description": { "type": "string" },
+        "conditions": { "$ref": "#/$defs/conditionNode" }
+      }
+    },
+    "conditionNode": {
+      "oneOf": [
+        { "$ref": "#/$defs/group" },
+        { "$ref": "#/$defs/comparison" },
+        { "$ref": "#/$defs/cross" }
+      ]
+    },
+    "group": {
+      "type": "object",
+      "required": ["type", "operator", "conditions"],
+      "properties": {
+        "type": { "const": "group" },
+        "operator": { "type": "string", "enum": ["AND", "OR"] },
+        "conditions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/conditionNode" }
+        }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "required": ["type", "left", "operator", "right"],
+      "properties": {
+        "type": { "const": "comparison" },
+        "left": { "$ref": "#/$defs/valueRef" },
+        "operator": { "type": "string", "enum": [">", ">=", "<", "<=", "==", "!="] },
+        "right": { "$ref": "#/$defs/valueRef" }
+      }
+    },
+    "cross": {
+      "type": "object",
+      "required": ["type", "direction", "left", "right"],
+      "properties": {
+        "type": { "const": "cross" },
+        "direction": { "type": "string", "enum": ["above", "below"] },
+        "left": { "$ref": "#/$defs/valueRef" },
+        "right": { "$ref": "#/$defs/valueRef" }
+      }
+    },
+    "valueRef": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["type", "value"],
+          "properties": {
+            "type": { "const": "number" },
+            "value": { "type": "number" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["type", "ref"],
+          "properties": {
+            "type": { "const": "indicator" },
+            "ref": {
+              "type": "object",
+              "required": ["id"],
+              "properties": {
+                "id": { "type": "string" },
+                "line": { "type": "string" },
+                "shift": { "type": "number" }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["type", "field"],
+          "properties": {
+            "type": { "const": "price" },
+            "field": { "type": "string", "enum": ["open", "high", "low", "close", "hl2", "hlc3"] },
+            "shift": { "type": "number" }
+          }
+        }
+      ]
+    },
+    "breakEven": {
+      "type": "object",
+      "required": ["enabled", "trigger_rr", "offset_points"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "trigger_rr": { "type": "number" },
+        "offset_points": { "type": "number" }
+      }
+    },
+    "trailingStop": {
+      "type": "object",
+      "required": ["enabled", "atr_multiplier"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "atr_multiplier": { "type": "number" }
+      }
+    },
+    "partials": {
+      "type": "object",
+      "required": ["enabled", "levels"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "levels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["rr", "percent_close"],
+            "properties": {
+              "rr": { "type": "number" },
+              "percent_close": { "type": "number" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
